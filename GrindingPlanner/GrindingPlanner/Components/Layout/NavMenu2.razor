@@ -1,0 +1,86 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+
+<nav class="col-12 col-md-auto p-md-2 bg-dark">
+    <li class="d-flex flex-row flex-md-column justify-content-center flex-wrap p-1 text-white bg-dark h-100
+                overflow-hidden">
+        <ul class="nav nav-pills flex-row flex-md-column flex-nowrap align-items-center align-items-md-stretch mb-md-auto">
+            <li class="nav-item"/>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Home</p>
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="counter">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Counter</p>
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="weather">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Weather</p>
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="auth">
+                    <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Auth Required</p>
+                </NavLink>
+            </li>
+            <AuthorizeView>
+                <Authorized>
+            <li class="nav-item">
+                        <NavLink class="nav-link" href="Account/Manage">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                        </NavLink>
+                    </li>
+            <li class="nav-item">
+                        <form action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                            <button type="submit" class="nav-link">
+                                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Logout</p>
+                            </button>
+                        </form>
+                    </li>
+                </Authorized>
+                <NotAuthorized>
+            <li class="nav-item">
+                        <NavLink class="nav-link" href="Account/Register">
+                            <span class="bi bi-person-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Register</p>
+                        </NavLink>
+                    </li>
+            <li class="nav-item">
+                        <NavLink class="nav-link" href="Account/Login">
+                            <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> <p class="d-none d-lg-block">Login</p>
+                        </NavLink>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+            <li class="nav-item" />
+        </ul>
+    </li>
+</nav>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+
