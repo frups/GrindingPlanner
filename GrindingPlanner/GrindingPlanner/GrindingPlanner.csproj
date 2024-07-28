@@ -18,7 +18,9 @@
 
   <ItemGroup>
 	<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-	<ServiceWorkerAssetsManifest Include="wwwroot\manifest.webmanifest.json" PublishedContent="wwwroot\manifest.webmanifest.published.json"/>
+	<ServiceWorkerAssetsManifest Include="wwwroot\manifest.webmanifest.json" PublishedContent="wwwroot\manifest.webmanifest.published.json" />
   </ItemGroup>
+
+  <Import Project="..\..\GrindingPlanner.Shared\GrindingPlanner.Shared.projitems" Label="Shared" />
 
 </Project>
