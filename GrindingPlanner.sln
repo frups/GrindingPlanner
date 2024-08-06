@@ -31,7 +31,7 @@ Global
 		SolutionGuid = {C68BB165-E596-4486-B79A-FF086C66962A}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{0cfe57b0-e6aa-413a-86f9-81aad47dd0d6}*SharedItemsImports = 13
+		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{3ca60ee8-1982-4fca-b586-cbfe437c61ea}*SharedItemsImports = 13
 		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{c7943c78-0810-4db0-ac76-7bf8be358fdf}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
