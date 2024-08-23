@@ -1,0 +1,51 @@
+﻿@page "/trainingplans/details"
+
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>TrainingPlan</h4>
+    <hr />
+    @if (trainingplan is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TrainingPlanName</dt>
+            <dd class="col-sm-10">@trainingplan.TrainingPlanName</dd>
+            <dt class="col-sm-2">OwnerId</dt>
+            <dd class="col-sm-10">@trainingplan.OwnerId</dd>
+            <dt class="col-sm-2">TrainerId</dt>
+            <dd class="col-sm-10">@trainingplan.TrainerId</dd>
+        </dl>
+        <div>
+            <a href="@($"/trainingplans/edit?trainingplanid={trainingplan.TrainingPlanId}")">Edit</a> |
+            <a href="@($"/trainingplans")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    TrainingPlan? trainingplan;
+
+    [SupplyParameterFromQuery]
+    public int TrainingPlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trainingplan = await context.TrainingPlan.FirstOrDefaultAsync(m => m.TrainingPlanId == TrainingPlanId);
+
+        if (trainingplan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

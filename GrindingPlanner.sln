@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35027.167
@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrindingPlanner", "Grinding
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrindingPlanner.Client", "GrindingPlanner\GrindingPlanner.Client\GrindingPlanner.Client.csproj", "{1B34C62D-D0DE-41AB-908B-598A80357F81}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GrindingPlanner.Shared", "GrindingPlanner.Shared\GrindingPlanner.Shared.shproj", "{3CA60EE8-1982-4FCA-B586-CBFE437C61EA}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GrindingPlanner.Shared", "GrindingPlanner.Shared\GrindingPlanner.Shared.shproj", "{0CFE57B0-E6AA-413A-86F9-81AAD47DD0D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +31,7 @@ Global
 		SolutionGuid = {C68BB165-E596-4486-B79A-FF086C66962A}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{1b34c62d-d0de-41ab-908b-598a80357f81}*SharedItemsImports = 5
-		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{3ca60ee8-1982-4fca-b586-cbfe437c61ea}*SharedItemsImports = 13
+		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{0cfe57b0-e6aa-413a-86f9-81aad47dd0d6}*SharedItemsImports = 13
 		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{c7943c78-0810-4db0-ac76-7bf8be358fdf}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,54 @@
+﻿@page "/trainingplans/create"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@using GrindingPlanner.Data
+
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager;
+@inject UserManager<ApplicationUser> userManager
+@inject AuthenticationStateProvider authenticationStateProvider;
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>TrainingPlan</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="TrainingPlan" OnValidSubmit="AddTrainingPlan" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="trainingplanname" class="form-label">TrainingPlanName:</label> 
+                <InputText id="trainingplanname" @bind-Value="TrainingPlan.TrainingPlanName" class="form-control" /> 
+                <ValidationMessage For="() => TrainingPlan.TrainingPlanName" class="text-danger" /> 
+            </div>       
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/trainingplans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public TrainingPlan TrainingPlan { get; set; } = new TrainingPlan();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddTrainingPlan()
+    {
+        using var DBcontext = DbFactory.CreateDbContext();
+        AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        ApplicationUser user = await userManager.GetUserAsync(state.User);
+        this.TrainingPlan.OwnerId = user.Id;
+        DBcontext.TrainingPlan.Add(TrainingPlan);
+        await DBcontext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/trainingplans");
+    }
+}

@@ -1,0 +1,86 @@
+﻿@page "/TrainingPlans/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Training Plan</PageTitle>
+@if (TrainingPlan is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <h1>@TrainingPlan.TrainingPlanName</h1>
+            <EditForm method="post" Model="TrainingPlan" OnValidSubmit="UpdateTrainingPlan" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="TrainingPlan.TrainingPlanId" value="@TrainingPlan.TrainingPlanId" />
+                <div class="mb-3">
+                    <label for="trainingplanname" class="form-label">TrainingPlanName:</label>
+                    <InputText id="trainingplanname" @bind-Value="TrainingPlan.TrainingPlanName" class="form-control" />
+                    <ValidationMessage For="() => TrainingPlan.TrainingPlanName" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/trainingplans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int TrainingPlanId { get; set; }
+
+    [SupplyParameterFromForm]
+    public TrainingPlan? TrainingPlan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        TrainingPlan ??= await context.TrainingPlan.FirstOrDefaultAsync(m => m.TrainingPlanId == TrainingPlanId);
+
+        if (TrainingPlan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateTrainingPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(TrainingPlan!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TrainingPlanExists(TrainingPlan!.TrainingPlanId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/trainingplans");
+    }
+
+    bool TrainingPlanExists(int trainingplanid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.TrainingPlan.Any(e => e.TrainingPlanId == trainingplanid);
+    }
+}
