@@ -23,20 +23,10 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="trainingplanid" class="form-label">TrainingPlanId:</label>
-                <InputNumber id="trainingplanid" @bind-Value="TrainingPlan.TrainingPlanId" class="form-control" />
-                <ValidationMessage For="() => TrainingPlan.TrainingPlanId" class="text-danger" />
-            </div>
-            <div class="mb-3">
                 <label for="trainingplanname" class="form-label">TrainingPlanName:</label> 
                 <InputText id="trainingplanname" @bind-Value="TrainingPlan.TrainingPlanName" class="form-control" /> 
                 <ValidationMessage For="() => TrainingPlan.TrainingPlanName" class="text-danger" /> 
-            </div>      
-            <div class="mb-3">
-                <label for="trainerid" class="form-label">TrainerId:</label> 
-                <InputText id="trainerid" @bind-Value="TrainingPlan.TrainerId" class="form-control" /> 
-                <ValidationMessage For="() => TrainingPlan.TrainerId" class="text-danger" /> 
-            </div>        
+            </div>       
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>

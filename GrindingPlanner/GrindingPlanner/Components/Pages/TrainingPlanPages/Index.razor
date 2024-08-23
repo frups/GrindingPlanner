@@ -1,26 +1,60 @@
 ﻿@page "/trainingplans"
 
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using GrindingPlanner.Shared
+@using GrindingPlanner.Data
+
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject UserManager<ApplicationUser> userManager
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject ApplicationDbContext _context
+@attribute [Authorize]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Training plans</PageTitle>
 
-<h1>Index</h1>
+<h1>My training plans</h1>
+
+<QuickGrid Class="table" Items="userTrainingPlans">
+    <PropertyColumn Property="userTrainingPlans => userTrainingPlans.TrainingPlanName" />
+    <PropertyColumn Property="userTrainingPlans => userTrainingPlans.TrainerId" />
+
+    <TemplateColumn Context="userTrainingPlans">
+        <a href="@($"trainingplans/edit?trainingplanid={userTrainingPlans.TrainingPlanId}")">Edit</a> |
+        <a href="@($"trainingplans/details?trainingplanid={userTrainingPlans.TrainingPlanId}")">Details</a> |
+        <a href="@($"trainingplans/delete?trainingplanid={userTrainingPlans.TrainingPlanId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
 
 <p>
     <a href="trainingplans/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().TrainingPlan">
-    <PropertyColumn Property="trainingplan => trainingplan.TrainingPlanName" />
-    <PropertyColumn Property="trainingplan => trainingplan.OwnerId" />
-    <PropertyColumn Property="trainingplan => trainingplan.TrainerId" />
+@code {
+    private IQueryable<TrainingPlan> userTrainingPlans;
+    private string userId = string.Empty;
 
-    <TemplateColumn Context="trainingplan">
-        <a href="@($"trainingplans/edit?trainingplanid={trainingplan.TrainingPlanId}")">Edit</a> |
-        <a href="@($"trainingplans/details?trainingplanid={trainingplan.TrainingPlanId}")">Details</a> |
-        <a href="@($"trainingplans/delete?trainingplanid={trainingplan.TrainingPlanId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        ApplicationUser user = await userManager.GetUserAsync(state.User);
+        userId = user.Id;
+        userTrainingPlans = _context.TrainingPlan.AsQueryable();
+        FilterTrainingPlans();
+    }
+
+    private void FilterTrainingPlans()
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            userTrainingPlans = userTrainingPlans;
+        }
+        else
+        {
+            userTrainingPlans = userTrainingPlans
+                .Where(tp => tp.OwnerId.Equals(userId));
+        }
+    }
+}
