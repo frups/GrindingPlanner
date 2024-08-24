@@ -23,7 +23,7 @@
 
     <TemplateColumn Context="userTrainingPlans">
         <a href="@($"trainingplans/edit?trainingplanid={userTrainingPlans.TrainingPlanId}")">Edit</a> |
-        <a href="@($"trainingplans/details?trainingplanid={userTrainingPlans.TrainingPlanId}")">Details</a> |
+        <a href="@($"weekplans/{userTrainingPlans.TrainingPlanId}")">Details</a> |
         <a href="@($"trainingplans/delete?trainingplanid={userTrainingPlans.TrainingPlanId}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>

@@ -1,0 +1,100 @@
+﻿@page "/WeekPlans/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>WeekPlan</h4>
+<hr />
+@if (WeekPlan is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="WeekPlan" OnValidSubmit="UpdateWeekPlan" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="WeekPlan.WeekPlanId" value="@WeekPlan.WeekPlanId" />
+                <div class="mb-3">
+                    <label for="trainingplanid" class="form-label">TrainingPlanId:</label>
+                    <InputNumber id="trainingplanid" @bind-Value="WeekPlan.TrainingPlanId" class="form-control" />
+                    <ValidationMessage For="() => WeekPlan.TrainingPlanId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weekplanfrom" class="form-label">WeekPlanFrom:</label>
+                    <InputDate id="weekplanfrom" @bind-Value="WeekPlan.WeekPlanFrom" class="form-control" />
+                    <ValidationMessage For="() => WeekPlan.WeekPlanFrom" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weekplanto" class="form-label">WeekPlanTo:</label>
+                    <InputDate id="weekplanto" @bind-Value="WeekPlan.WeekPlanTo" class="form-control" />
+                    <ValidationMessage For="() => WeekPlan.WeekPlanTo" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/weekplans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int WeekPlanId { get; set; }
+
+    [SupplyParameterFromForm]
+    public WeekPlan? WeekPlan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        WeekPlan ??= await context.WeekPlan.FirstOrDefaultAsync(m => m.WeekPlanId == WeekPlanId);
+
+        if (WeekPlan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateWeekPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(WeekPlan!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!WeekPlanExists(WeekPlan!.WeekPlanId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/weekplans");
+    }
+
+    bool WeekPlanExists(int weekplanid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.WeekPlan.Any(e => e.WeekPlanId == weekplanid);
+    }
+}

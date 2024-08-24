@@ -1,0 +1,51 @@
+﻿@page "/weekplans/details"
+
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>WeekPlan</h4>
+    <hr />
+    @if (weekplan is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TrainingPlanId</dt>
+            <dd class="col-sm-10">@weekplan.TrainingPlanId</dd>
+            <dt class="col-sm-2">WeekPlanFrom</dt>
+            <dd class="col-sm-10">@weekplan.WeekPlanFrom</dd>
+            <dt class="col-sm-2">WeekPlanTo</dt>
+            <dd class="col-sm-10">@weekplan.WeekPlanTo</dd>
+        </dl>
+        <div>
+            <a href="@($"/weekplans/edit?weekplanid={weekplan.WeekPlanId}")">Edit</a> |
+            <a href="@($"/weekplans")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    WeekPlan? weekplan;
+
+    [SupplyParameterFromQuery]
+    public int WeekPlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        weekplan = await context.WeekPlan.FirstOrDefaultAsync(m => m.WeekPlanId == WeekPlanId);
+
+        if (weekplan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

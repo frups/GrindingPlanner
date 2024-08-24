@@ -1,0 +1,58 @@
+﻿@page "/weekplans/{TrainingPlanId:int}"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GrindingPlanner.Shared
+@using GrindingPlanner.Data
+
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject ApplicationDbContext _context
+@attribute [Authorize]
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="weekplans/create/@TrainingPlanId">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="trainingWeekPlans">
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.TrainingPlanId" />
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.WeekPlanFrom" />
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.WeekPlanTo" />
+
+    <TemplateColumn Context="trainingWeekPlans">
+        <a href="@($"weekplans/edit?weekplanid={trainingWeekPlans.WeekPlanId}")">Edit</a> |
+        <a href="@($"weekplans/details?weekplanid={trainingWeekPlans.WeekPlanId}")">Details</a> |
+        <a href="@($"weekplans/delete?weekplanid={trainingWeekPlans.WeekPlanId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    [Parameter]
+    public int TrainingPlanId { get; set; }
+
+    private IQueryable<WeekPlan> trainingWeekPlans;
+
+    protected override async Task OnInitializedAsync()
+    {
+        trainingWeekPlans = _context.WeekPlan.AsQueryable();
+        FilterWeekPlans();
+    }
+
+    private void FilterWeekPlans()
+    {
+        if (string.IsNullOrWhiteSpace(TrainingPlanId.ToString()))
+        {
+            trainingWeekPlans = trainingWeekPlans;
+        }
+        else
+        {
+            trainingWeekPlans = trainingWeekPlans
+                .Where(tp => tp.TrainingPlanId.Equals(TrainingPlanId));
+        }
+    }
+}

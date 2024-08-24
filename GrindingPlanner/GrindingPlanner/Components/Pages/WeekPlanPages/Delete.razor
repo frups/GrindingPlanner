@@ -1,0 +1,65 @@
+﻿@page "/weekplans/delete"
+
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>WeekPlan</h4>
+    <hr />
+    @if (weekplan is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TrainingPlanId</dt>
+            <dd class="col-sm-10">@weekplan.TrainingPlanId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">WeekPlanFrom</dt>
+            <dd class="col-sm-10">@weekplan.WeekPlanFrom</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">WeekPlanTo</dt>
+            <dd class="col-sm-10">@weekplan.WeekPlanTo</dd>
+        </dl>
+        <EditForm method="post" Model="weekplan" OnValidSubmit="DeleteWeekPlan" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(weekplan is null)">Delete</button> |
+            <a href="/weekplans">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    WeekPlan? weekplan;
+
+    [SupplyParameterFromQuery]
+    public int WeekPlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        weekplan = await context.WeekPlan.FirstOrDefaultAsync(m => m.WeekPlanId == WeekPlanId);
+
+        if (weekplan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteWeekPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.WeekPlan.Remove(weekplan!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/weekplans");
+    }
+}
