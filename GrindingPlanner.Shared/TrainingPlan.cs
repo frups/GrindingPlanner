@@ -13,5 +13,7 @@ namespace GrindingPlanner.Shared
         public string? TrainingPlanName { get; set; } = String.Empty;
         public string? OwnerId { get; set; }
         public string? TrainerId { get; set; } = String.Empty;
+
+        public List<WeekPlan> WeekPlans { get; set; }
     }
 }

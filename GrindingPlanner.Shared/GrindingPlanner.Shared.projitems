@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)TrainingPlan.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WeekPlan.cs" />
   </ItemGroup>
 </Project>
