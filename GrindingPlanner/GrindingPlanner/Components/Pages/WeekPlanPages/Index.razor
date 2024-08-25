@@ -11,6 +11,7 @@
 
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
 @inject ApplicationDbContext _context
+@inject NavigationManager NavigationManager 
 @attribute [Authorize]
 
 <PageTitle>Index</PageTitle>
@@ -43,6 +44,8 @@
 
     private IQueryable<WeekPlan> trainingWeekPlans;
 
+    private IQueryable<WeekPlan> newestWeekPlan;
+
     private int CurrentWeekNumber { get; set;}
 
     private DateOnly WeekPlanFrom { get; set; }
@@ -56,6 +59,7 @@
         trainingWeekPlans = _context.WeekPlan.AsQueryable();
         CurrentWeekNumber = DateWeekResolver.GetCurrentWeekNumber();
         FilterWeekPlans();
+        newestWeekPlan = trainingWeekPlans.OrderByDescending(tp => tp.WeekPlanFrom).Take(1);
     }
 
     private void FilterWeekPlans()
@@ -71,45 +75,17 @@
         }
     }
 
-    /*
-    private void OnCreateNewButtonClick()
-        {
-        Console.WriteLine("Create new button clicked");
-    }*/
     private async Task OnCreateNewButtonClick()
     {
-        Console.WriteLine("Create new button clicked");
-        int NewWeekNumber = CurrentWeekNumber;
+        using var context = DbFactory.CreateDbContext();
+
         WeekPlan.TrainingPlanId = TrainingPlanId;
-        //clickCount++;
-        added = false;
+        WeekPlan.WeekPlanFrom = newestWeekPlan.ElementAt(0).WeekPlanFrom.AddDays(7);
+        WeekPlan.WeekPlanTo = newestWeekPlan.ElementAt(0).WeekPlanTo.AddDays(7);
 
-        while(!added)
-        {
-            WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, NewWeekNumber));
-            NewWeekNumber++;
+        context.WeekPlan.Add(WeekPlan);
+        await context.SaveChangesAsync();
 
-            foreach (var weekPlan in trainingWeekPlans)
-            {
-                if (weekPlan.WeekPlanFrom == WeekPlanFrom)
-                {
-                    added = false;
-                    break;
-                }
-                else
-                {
-                    using var context = DbFactory.CreateDbContext();
-                    WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, NewWeekNumber));
-                    WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfWeek(DateTime.Now.Year, NewWeekNumber));
-                    context.WeekPlan.Add(WeekPlan);
-                    await context.SaveChangesAsync();
-                    added = true;
-                    break;
-                }
-            }
-            StateHasChanged();
-        }
-
-
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 }
