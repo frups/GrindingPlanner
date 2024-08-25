@@ -1,10 +1,12 @@
 ﻿@page "/weekplans/{TrainingPlanId:int}"
+@rendermode InteractiveServer
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using GrindingPlanner.Shared
+@using GrindingPlanner.Shared.Utils
 @using GrindingPlanner.Data
 
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
@@ -16,7 +18,8 @@
 <h1>Index</h1>
 
 <p>
-    <a href="weekplans/create/@TrainingPlanId">Create New</a>
+    <a href="weekplans/create/@TrainingPlanId" >Create New</a>
+    <button @onclick="OnCreateNewButtonClick">Create New</button>
 </p>
 
 <QuickGrid Class="table" Items="trainingWeekPlans">
@@ -35,11 +38,23 @@
     [Parameter]
     public int TrainingPlanId { get; set; }
 
+    [SupplyParameterFromForm]
+    public WeekPlan WeekPlan { get; set; } = new();
+
     private IQueryable<WeekPlan> trainingWeekPlans;
+
+    private int CurrentWeekNumber { get; set;}
+
+    private DateOnly WeekPlanFrom { get; set; }
+
+    private DateOnly WeekPlanTo { get; set; }
+
+    private bool added;
 
     protected override async Task OnInitializedAsync()
     {
         trainingWeekPlans = _context.WeekPlan.AsQueryable();
+        CurrentWeekNumber = DateWeekResolver.GetCurrentWeekNumber();
         FilterWeekPlans();
     }
 
@@ -54,5 +69,47 @@
             trainingWeekPlans = trainingWeekPlans
                 .Where(tp => tp.TrainingPlanId.Equals(TrainingPlanId));
         }
+    }
+
+    /*
+    private void OnCreateNewButtonClick()
+        {
+        Console.WriteLine("Create new button clicked");
+    }*/
+    private async Task OnCreateNewButtonClick()
+    {
+        Console.WriteLine("Create new button clicked");
+        int NewWeekNumber = CurrentWeekNumber;
+        WeekPlan.TrainingPlanId = TrainingPlanId;
+        //clickCount++;
+        added = false;
+
+        while(!added)
+        {
+            WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, NewWeekNumber));
+            NewWeekNumber++;
+
+            foreach (var weekPlan in trainingWeekPlans)
+            {
+                if (weekPlan.WeekPlanFrom == WeekPlanFrom)
+                {
+                    added = false;
+                    break;
+                }
+                else
+                {
+                    using var context = DbFactory.CreateDbContext();
+                    WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, NewWeekNumber));
+                    WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfWeek(DateTime.Now.Year, NewWeekNumber));
+                    context.WeekPlan.Add(WeekPlan);
+                    await context.SaveChangesAsync();
+                    added = true;
+                    break;
+                }
+            }
+            StateHasChanged();
+        }
+
+
     }
 }

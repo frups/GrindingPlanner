@@ -1,6 +1,7 @@
 ﻿@page "/weekplans/create/{TrainingPlanId:int}"
 @using Microsoft.EntityFrameworkCore
 @using GrindingPlanner.Shared
+@using GrindingPlanner.Shared.Utils
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -36,7 +37,7 @@
 </div>
 
 <div>
-    <a href="/weekplans">Back to List</a>
+    <a href="/weekplans/@TrainingPlanId">Back to List</a>
 </div>
 
 @code {
@@ -49,8 +50,12 @@
     protected override void OnInitialized()
     {
         WeekPlan.TrainingPlanId = TrainingPlanId;
-        //WeekPlan.WeekPlanFrom = TrainingPlanId;
-        //WeekPlan.WeekPlanTo = TrainingPlanId;
+        WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfCurrentWeek());
+        WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfCurrentWeek());
+        /*
+        int WeekNumber = DateWeekResolver.GetCurrentWeekNumber() + 1;
+        WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, WeekNumber));
+        WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfWeek(DateTime.Now.Year, WeekNumber));*/
     }
 
 
@@ -61,6 +66,6 @@
         WeekPlan.TrainingPlanId = TrainingPlanId;
         context.WeekPlan.Add(WeekPlan);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/weekplans");
+        NavigationManager.NavigateTo("/weekplans/"+@TrainingPlanId);
     }
 }
