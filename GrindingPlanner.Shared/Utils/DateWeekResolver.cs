@@ -51,5 +51,17 @@ namespace GrindingPlanner.Shared.Utils
             DateTime date = DateTime.Now;
             return GetLastDayOfWeek(date.Year, GetWeekNumber(date));
         }
+
+        public static DateTime GetFirstDayOfFollowingWeek(int weekNumberFromCurrent)
+        {
+            DateTime date = DateTime.Now;
+            return GetFirstDayOfWeek(date.Year, GetWeekNumber(date) + weekNumberFromCurrent);
+        }
+
+        public static DateTime GetLastDateOfFollwingNextWeek(int weekNumberFromCurrent)
+        {
+            DateTime date = DateTime.Now;
+            return GetLastDayOfWeek(date.Year, GetWeekNumber(date) + weekNumberFromCurrent);
+        }
     }
 }

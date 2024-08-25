@@ -37,6 +37,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{0cfe57b0-e6aa-413a-86f9-81aad47dd0d6}*SharedItemsImports = 13
+		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{51376f76-a8ec-4d48-8f88-82f0aec991ba}*SharedItemsImports = 5
 		GrindingPlanner.Shared\GrindingPlanner.Shared.projitems*{c7943c78-0810-4db0-ac76-7bf8be358fdf}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

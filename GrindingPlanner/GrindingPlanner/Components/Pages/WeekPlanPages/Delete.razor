@@ -33,7 +33,7 @@
         </dl>
         <EditForm method="post" Model="weekplan" OnValidSubmit="DeleteWeekPlan" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(weekplan is null)">Delete</button> |
-            <a href="/weekplans">Back to List</a>
+            <a href="/weekplans/@weekplan.TrainingPlanId">Back to List</a>
         </EditForm>
     }
 </div>
@@ -44,6 +44,8 @@
     [SupplyParameterFromQuery]
     public int WeekPlanId { get; set; }
 
+    public int TrainingPlanId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
@@ -53,6 +55,8 @@
         {
             NavigationManager.NavigateTo("notfound");
         }
+
+        TrainingPlanId = weekplan.TrainingPlanId;
     }
 
     public async Task DeleteWeekPlan()
@@ -60,6 +64,6 @@
         using var context = DbFactory.CreateDbContext();
         context.WeekPlan.Remove(weekplan!);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/weekplans/" + weekplan.TrainingPlanId);
+        NavigationManager.NavigateTo("/weekplans/" + TrainingPlanId);
     }
 }

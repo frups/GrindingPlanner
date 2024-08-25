@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
-using GrindingPlanner.Data;
+using GrindingPlanner;
 
 namespace GrindingPlanner.Shared
 {

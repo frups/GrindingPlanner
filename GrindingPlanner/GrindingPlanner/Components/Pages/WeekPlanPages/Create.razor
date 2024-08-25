@@ -66,6 +66,6 @@
         WeekPlan.TrainingPlanId = TrainingPlanId;
         context.WeekPlan.Add(WeekPlan);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/weekplans/"+@TrainingPlanId);
+        NavigationManager.NavigateTo("/weekplans/"+TrainingPlanId);
     }
 }
