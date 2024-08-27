@@ -20,7 +20,7 @@
 
 <p>
     <a href="weekplans/create/@TrainingPlanId" >Create New</a>
-    <button @onclick="OnCreateNewButtonClick">Create New</button>
+    <button @onclick="AddNextWeekPlan">Create New</button>
 </p>
 
 <QuickGrid Class="table" Items="trainingWeekPlans">
@@ -46,20 +46,16 @@
 
     private IQueryable<WeekPlan> newestWeekPlan;
 
-    private int CurrentWeekNumber { get; set;}
-
     private DateOnly WeekPlanFrom { get; set; }
 
     private DateOnly WeekPlanTo { get; set; }
 
     private bool added;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         trainingWeekPlans = _context.WeekPlan.AsQueryable();
-        CurrentWeekNumber = DateWeekResolver.GetCurrentWeekNumber();
         FilterWeekPlans();
-        newestWeekPlan = trainingWeekPlans.OrderByDescending(tp => tp.WeekPlanFrom).Take(1);
     }
 
     private void FilterWeekPlans()
@@ -75,10 +71,11 @@
         }
     }
 
-    private async Task OnCreateNewButtonClick()
+    private async Task AddNextWeekPlan()
     {
         using var context = DbFactory.CreateDbContext();
 
+        newestWeekPlan = trainingWeekPlans.OrderByDescending(tp => tp.WeekPlanFrom).Take(1);
         WeekPlan.TrainingPlanId = TrainingPlanId;
         WeekPlan.WeekPlanFrom = newestWeekPlan.ElementAt(0).WeekPlanFrom.AddDays(7);
         WeekPlan.WeekPlanTo = newestWeekPlan.ElementAt(0).WeekPlanTo.AddDays(7);
