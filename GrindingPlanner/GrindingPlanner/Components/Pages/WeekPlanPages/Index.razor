@@ -17,7 +17,7 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Index</h1>
+<h1>Weeks</h1>
 
 <p>
     <a href="weekplans/create/@TrainingPlanId" >Create New</a>
@@ -45,13 +45,13 @@
     }
     else
     {
-        <MudCarousel TData="WeekPlan">
+        <MudCarousel TData="WeekPlan" AutoCycle=false ShowBullets=false>
             @foreach (var week in trainingWeekPlans)
             {
                 <MudCarouselItem>
                     <MudCard>
-                        <MudCardHeader>
-                            <MudText Typo="Typo.h6">@week.WeekPlanFrom - @week.WeekPlanTo</MudText>
+                        <MudCardHeader Align="MudBlazor.Align.Center">
+                            <MudText Align="MudBlazor.Align.Center" Typo="Typo.h6">@week.WeekPlanFrom - @week.WeekPlanTo</MudText>
                         </MudCardHeader>
                         <MudCardContent>
                             <MudText>@week.WeekPlanId</MudText>
