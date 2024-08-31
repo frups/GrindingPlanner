@@ -1,0 +1,120 @@
+﻿@page "/weekplans/{TrainingPlanId:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GrindingPlanner.Shared
+@using GrindingPlanner.Shared.Utils
+@using GrindingPlanner.Data
+@using MudBlazor
+
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject ApplicationDbContext _context
+@inject NavigationManager NavigationManager 
+@attribute [Authorize]
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="weekplans/create/@TrainingPlanId" >Create New</a>
+    <button @onclick="AddNextWeekPlan">Create New</button>
+</p>
+
+<!--
+<QuickGrid Class="table" Items="trainingWeekPlans">
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.TrainingPlanId" />
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.WeekPlanFrom" />
+    <PropertyColumn Property="trainingWeekPlans => trainingWeekPlans.WeekPlanTo" />
+
+    <TemplateColumn Context="trainingWeekPlans">
+        <a href="@($"weekplans/edit?weekplanid={trainingWeekPlans.WeekPlanId}")">Edit</a> |
+        <a href="@($"weekplans/details?weekplanid={trainingWeekPlans.WeekPlanId}")">Details</a> |
+        <a href="@($"weekplans/delete?weekplanid={trainingWeekPlans.WeekPlanId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+-->
+
+<MudContainer>
+    @if (trainingWeekPlans == null)
+    {
+        <MudText Typo="Typo.h6">Loading...</MudText>
+    }
+    else
+    {
+        <MudCarousel TData="WeekPlan">
+            @foreach (var week in trainingWeekPlans)
+            {
+                <MudCarouselItem>
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h6">@week.WeekPlanFrom - @week.WeekPlanTo</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText>@week.WeekPlanId</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary">Details</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudCarouselItem>
+            }
+        </MudCarousel>
+    }
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public int TrainingPlanId { get; set; }
+
+    [SupplyParameterFromForm]
+    public WeekPlan WeekPlan { get; set; } = new();
+
+    private IQueryable<WeekPlan> trainingWeekPlans;
+
+    private IQueryable<WeekPlan> newestWeekPlan;
+
+    private DateOnly WeekPlanFrom { get; set; }
+
+    private DateOnly WeekPlanTo { get; set; }
+
+    private bool added;
+
+    protected override void OnInitialized()
+    {
+        trainingWeekPlans = _context.WeekPlan.AsQueryable();
+        FilterWeekPlans();
+    }
+
+    private void FilterWeekPlans()
+    {
+        if (string.IsNullOrWhiteSpace(TrainingPlanId.ToString()))
+        {
+            trainingWeekPlans = trainingWeekPlans;
+        }
+        else
+        {
+            trainingWeekPlans = trainingWeekPlans
+                .Where(tp => tp.TrainingPlanId.Equals(TrainingPlanId));
+        }
+    }
+
+    private async Task AddNextWeekPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        newestWeekPlan = trainingWeekPlans.OrderByDescending(tp => tp.WeekPlanFrom).Take(1);
+        WeekPlan.TrainingPlanId = TrainingPlanId;
+        WeekPlan.WeekPlanFrom = newestWeekPlan.ElementAt(0).WeekPlanFrom.AddDays(7);
+        WeekPlan.WeekPlanTo = newestWeekPlan.ElementAt(0).WeekPlanTo.AddDays(7);
+
+        context.WeekPlan.Add(WeekPlan);
+        await context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+}

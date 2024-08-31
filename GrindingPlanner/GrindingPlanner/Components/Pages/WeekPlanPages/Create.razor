@@ -1,0 +1,71 @@
+﻿@page "/weekplans/create/{TrainingPlanId:int}"
+@using Microsoft.EntityFrameworkCore
+@using GrindingPlanner.Shared
+@using GrindingPlanner.Shared.Utils
+@inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>WeekPlan</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="WeekPlan" OnValidSubmit="AddWeekPlan" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="trainingplanid" class="form-label">TrainingPlanId:</label> 
+                <InputNumber id="trainingplanid" @bind-Value="WeekPlan.TrainingPlanId" class="form-control" /> 
+                <ValidationMessage For="() => WeekPlan.TrainingPlanId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="weekplanfrom" class="form-label">WeekPlanFrom:</label> 
+                <InputDate id="weekplanfrom" @bind-Value="WeekPlan.WeekPlanFrom" class="form-control" /> 
+                <ValidationMessage For="() => WeekPlan.WeekPlanFrom" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="weekplanto" class="form-label">WeekPlanTo:</label> 
+                <InputDate id="weekplanto" @bind-Value="WeekPlan.WeekPlanTo" class="form-control" /> 
+                <ValidationMessage For="() => WeekPlan.WeekPlanTo" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/weekplans/@TrainingPlanId">Back to List</a>
+</div>
+
+@code {
+    [Parameter]
+    public int TrainingPlanId { get; set; }
+
+    [SupplyParameterFromForm]
+    public WeekPlan WeekPlan { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        WeekPlan.TrainingPlanId = TrainingPlanId;
+        WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfCurrentWeek());
+        WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfCurrentWeek());
+        /*
+        int WeekNumber = DateWeekResolver.GetCurrentWeekNumber() + 1;
+        WeekPlan.WeekPlanFrom = DateOnly.FromDateTime(DateWeekResolver.GetFirstDayOfWeek(DateTime.Now.Year, WeekNumber));
+        WeekPlan.WeekPlanTo = DateOnly.FromDateTime(DateWeekResolver.GetLastDayOfWeek(DateTime.Now.Year, WeekNumber));*/
+    }
+
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddWeekPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        WeekPlan.TrainingPlanId = TrainingPlanId;
+        context.WeekPlan.Add(WeekPlan);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/weekplans/"+TrainingPlanId);
+    }
+}

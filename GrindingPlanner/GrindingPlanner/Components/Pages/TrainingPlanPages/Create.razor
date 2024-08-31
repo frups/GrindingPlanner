@@ -11,6 +11,8 @@
 @inject UserManager<ApplicationUser> userManager
 @inject AuthenticationStateProvider authenticationStateProvider;
 
+@attribute [Authorize]
+
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
@@ -26,7 +28,17 @@
                 <label for="trainingplanname" class="form-label">TrainingPlanName:</label> 
                 <InputText id="trainingplanname" @bind-Value="TrainingPlan.TrainingPlanName" class="form-control" /> 
                 <ValidationMessage For="() => TrainingPlan.TrainingPlanName" class="text-danger" /> 
-            </div>       
+            </div>        
+            <div class="mb-3">
+                <label for="ownerid" class="form-label">OwnerId:</label> 
+                <InputText id="ownerid" @bind-Value="TrainingPlan.OwnerId" class="form-control" /> 
+                <ValidationMessage For="() => TrainingPlan.OwnerId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="trainerid" class="form-label">TrainerId:</label> 
+                <InputText id="trainerid" @bind-Value="TrainingPlan.TrainerId" class="form-control" /> 
+                <ValidationMessage For="() => TrainingPlan.TrainerId" class="text-danger" /> 
+            </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -37,18 +49,29 @@
 </div>
 
 @code {
+
     [SupplyParameterFromForm]
-    public TrainingPlan TrainingPlan { get; set; } = new TrainingPlan();
+    public TrainingPlan TrainingPlan { get; set; } = new();
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddTrainingPlan()
     {
-        using var DBcontext = DbFactory.CreateDbContext();
-        AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
-        ApplicationUser user = await userManager.GetUserAsync(state.User);
-        this.TrainingPlan.OwnerId = user.Id;
-        DBcontext.TrainingPlan.Add(TrainingPlan);
-        await DBcontext.SaveChangesAsync();
+        using var context = DbFactory.CreateDbContext();
+
+        await SetLoggedUserAsTrainingPlanOwner();
+
+        context.TrainingPlan.Add(TrainingPlan);
+        await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/trainingplans");
+    }
+
+    public async Task SetLoggedUserAsTrainingPlanOwner()
+    {
+        AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        ApplicationUser? user = await userManager.GetUserAsync(state.User);
+        if (user is not null)
+        {
+            TrainingPlan.OwnerId = user.Id;
+        }
     }
 }

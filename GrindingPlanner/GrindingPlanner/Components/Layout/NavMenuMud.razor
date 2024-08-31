@@ -1,0 +1,13 @@
+﻿@using MudBlazor
+
+<MudNavMenu>
+    <MudNavLink Href="trainingplans" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Notes">Plans</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="Account/Manage" Icon="@Icons.Material.Filled.Person">Account</MudNavLink>
+            <MudNavLink Href="Account/Logout" Icon="@Icons.Material.Filled.Logout">Logout</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+    <MudNavLink Href="auth" Icon="@Icons.Material.Filled.VerifiedUser">Account</MudNavLink>
+</MudNavMenu>
+

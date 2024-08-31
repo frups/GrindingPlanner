@@ -6,35 +6,84 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using GrindingPlanner.Shared
 @using GrindingPlanner.Data
-
+@using MudBlazor;
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
 @inject UserManager<ApplicationUser> userManager
 @inject AuthenticationStateProvider authenticationStateProvider;
 @inject ApplicationDbContext _context
+@implements IAsyncDisposable
 @attribute [Authorize]
 
 <PageTitle>Training plans</PageTitle>
 
-<h1>My training plans</h1>
+<MudText>Training plans</MudText>
 
+<!--
 <QuickGrid Class="table" Items="userTrainingPlans">
     <PropertyColumn Property="userTrainingPlans => userTrainingPlans.TrainingPlanName" />
     <PropertyColumn Property="userTrainingPlans => userTrainingPlans.TrainerId" />
 
     <TemplateColumn Context="userTrainingPlans">
         <a href="@($"trainingplans/edit?trainingplanid={userTrainingPlans.TrainingPlanId}")">Edit</a> |
-        <a href="@($"trainingplans/details?trainingplanid={userTrainingPlans.TrainingPlanId}")">Details</a> |
+        <a href="@($"weekplans/{userTrainingPlans.TrainingPlanId}")">Details</a> |
         <a href="@($"trainingplans/delete?trainingplanid={userTrainingPlans.TrainingPlanId}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
+-->
 
-<p>
-    <a href="trainingplans/create">Create New</a>
-</p>
+<MudContainer>
+    <MudGrid>
+        @if (userTrainingPlansArray == null)
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.h6">Loading...</MudText>
+            </MudItem>
+        }
+        else
+        {
+            @foreach (var userTrainingPlan in userTrainingPlansArray) {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudCardTitle>
+                                @userTrainingPlan.TrainingPlanName
+                            </MudCardTitle>
+                        </MudCardHeader>
+                        <MudCardActions>
+                            <MudButton Href="@GetOpenTrainingPlanIdUrl(userTrainingPlan.TrainingPlanId)" Color="Color.Primary">Open</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>}
+        }
+           <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Icon="@Icons.Material.Filled.NewLabel">
+                            Add new training plan
+                        </MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Href="trainingplans/create" Color="Color.Primary">New plan</MudButton>
+                    </MudCardActions>
+                </MudCard>
+           </MudItem>
+    </MudGrid>
+</MudContainer>
+
 
 @code {
     private IQueryable<TrainingPlan> userTrainingPlans;
+    private TrainingPlan[]? userTrainingPlansArray;
     private string userId = string.Empty;
+
+    private string currentUrl = string.Empty;
+
+    ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,8 +92,8 @@
         userId = user.Id;
         userTrainingPlans = _context.TrainingPlan.AsQueryable();
         FilterTrainingPlans();
+        userTrainingPlansArray = userTrainingPlans.ToArray();
     }
-
     private void FilterTrainingPlans()
     {
         if (string.IsNullOrWhiteSpace(userId))
@@ -57,4 +106,11 @@
                 .Where(tp => tp.OwnerId.Equals(userId));
         }
     }
+
+    private string GetOpenTrainingPlanIdUrl(int trainingplanid)
+    {
+        return $"weekplans/{trainingplanid}";
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

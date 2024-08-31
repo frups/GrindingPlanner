@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
-using GrindingPlanner.Data;
+using GrindingPlanner;
 
 namespace GrindingPlanner.Shared
 {
@@ -13,5 +13,7 @@ namespace GrindingPlanner.Shared
         public string? TrainingPlanName { get; set; } = String.Empty;
         public string? OwnerId { get; set; }
         public string? TrainerId { get; set; } = String.Empty;
+
+        public List<WeekPlan> WeekPlans { get; set; }
     }
 }

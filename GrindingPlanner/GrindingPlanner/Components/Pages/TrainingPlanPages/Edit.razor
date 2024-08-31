@@ -5,7 +5,12 @@
 @inject IDbContextFactory<GrindingPlanner.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Training Plan</PageTitle>
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>TrainingPlan</h4>
+<hr />
 @if (TrainingPlan is null)
 {
     <p><em>Loading...</em></p>
@@ -14,7 +19,6 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <h1>@TrainingPlan.TrainingPlanName</h1>
             <EditForm method="post" Model="TrainingPlan" OnValidSubmit="UpdateTrainingPlan" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -23,6 +27,16 @@ else
                     <label for="trainingplanname" class="form-label">TrainingPlanName:</label>
                     <InputText id="trainingplanname" @bind-Value="TrainingPlan.TrainingPlanName" class="form-control" />
                     <ValidationMessage For="() => TrainingPlan.TrainingPlanName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ownerid" class="form-label">OwnerId:</label>
+                    <InputText id="ownerid" @bind-Value="TrainingPlan.OwnerId" class="form-control" />
+                    <ValidationMessage For="() => TrainingPlan.OwnerId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="trainerid" class="form-label">TrainerId:</label>
+                    <InputText id="trainerid" @bind-Value="TrainingPlan.TrainerId" class="form-control" />
+                    <ValidationMessage For="() => TrainingPlan.TrainerId" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
