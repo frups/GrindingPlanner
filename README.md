@@ -1,4 +1,4 @@
-### Workout planner:
+## Workout planner:
 
 Simple CRUD application made in .NET 8 using Blazor for managing workout plan.
 
